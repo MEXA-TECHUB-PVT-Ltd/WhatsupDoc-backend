@@ -286,12 +286,3 @@ exports.deleteHospitalProfile = async (req,res)=>{
     }
 }
 
-exports.getStatesByCountryName = (req,res)=>{
-
-    console.log("in body")
-    axios.get("https://www.universal-tutorial.com/api/states/pakistan").
-    then(res => console.log(res.data))
-    .catch(err => console.log(err))
-
-
-}
