@@ -1,5 +1,6 @@
 
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
+const { ExportConfigurationContext } = require("twilio/lib/rest/bulkexports/v1/exportConfiguration");
 const work_day_for_officeModel= require("../models/work_day_for_officeModel")
 
 
@@ -40,4 +41,162 @@ exports.createWorkDayForOffice = async (req,res)=>{
         })
     }
 
+}
+
+exports.getAllWorkDays=async (req,res)=>{
+    try{
+       const result=await work_day_for_officeModel.find({}).populate("doc_id");
+       if(result){
+        res.json({
+            message: "Result Fetched",
+            result:result,
+            statusCode:200
+        })
+       }
+       else{
+        res.json({
+            message: "Could not find result",
+            result:null,
+            statusCode:404
+        })
+       }
+       
+    }
+    catch(err){
+        res.json({
+            message: "Error Occurred",
+            error:err.message,
+            statusCode:500
+        })
+    }
+}
+
+exports.getWorkDayById=async (req,res)=>{
+    try{
+       const workDayId = req.params.workDayId; 
+       const result=await work_day_for_officeModel.find({_id:workDayId}).populate("doc_id");
+       if(result){
+        res.json({
+            message: "Result Fetched",
+            result:result,
+            statusCode:200
+        })
+       }
+       else{
+        res.json({
+            message: "Could not find result",
+            result:null,
+            statusCode:404
+        })
+       }
+       
+    }
+    catch(err){
+        res.json({
+            message: "Error Occurred",
+            error:err.message,
+            statusCode:500
+        })
+    }
+}
+
+exports.deleteWorkDay = async(req,res)=>{
+    try{
+        const workDayId = req.params.workDayId;
+        const result= await work_day_for_officeModel.deleteOne({_id:workDayId})
+        if(result.deletedCount>0){
+            res.json({
+                message: "workDay deleted successfully",
+                result:result,
+                statusCode:200
+            })
+        }
+        else{
+            res.json({
+                message: "work day could not be deleted",
+                result:result,
+                statusCode:404
+            })
+        }
+    }
+    catch(err){
+        res.json({
+            message: "Error occurred while deleting",
+            error:err.message,
+            statusCode:200
+        })
+    }
+}
+
+exports.updateWorkDay = async (req,res)=>{
+    try{
+        const workDayId = req.body.workDayId;
+        const doc_id = req.body.doc_id;
+        const day= req.body.day;
+        const type_of_work = req.body.type_of_work;
+
+        const result = await work_day_for_officeModel.findOneAndUpdate({_id:workDayId}
+            ,
+            {
+                doc_id:doc_id,
+                day:day,
+                type_of_work:type_of_work,
+            },
+            {
+                new:true
+            }
+            )
+            
+            if(result){
+                res.json({
+                    message: "updated successfully",
+                    result:result
+                })
+            }
+            else{
+                res.json({
+                    message: "could not update successfully , work day with this id may not exist",
+                    result:null,
+                    
+
+
+                })
+            }
+    }
+    catch(err){
+        res.json({
+            message: "Error occurred while updating",
+            error:err.message,
+            statusCode:500
+        })
+    }
+    
+}
+
+exports.getWorkDaysByDoctorId= async (req,res)=>{
+    const doc_id = req.params.doc_id;
+
+    try{
+        const result= await work_day_for_officeModel.find({doc_id:doc_id}).populate("doc_id")
+        if(result){
+            res.json({
+                message: "WorkDays of doctor found",
+                result:result,
+                statusCode:200
+            })
+        }
+        else{
+            res.json({
+                message: "could not found work days",
+                result:result,
+                statusCode:404
+            })
+        }
+    }
+    catch(err){
+        res.json({
+            message: "Error occurred",
+            error:err.message,
+        })
+    }
 }

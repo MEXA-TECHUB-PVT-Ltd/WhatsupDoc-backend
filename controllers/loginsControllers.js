@@ -10,6 +10,7 @@ const auth= require("../middlewares/auth");
 const loginsModel = require("../models/loginsModel");
 const { request } = require("express");
 const doctorModel = require("../models/doctorModel")
+const patientModel= require("../models/patientModel")
 
 
 exports.register= async (req,res)=>{
@@ -44,6 +45,12 @@ exports.register= async (req,res)=>{
         }
         else if(req.body.table_name==="doctor"){
             savedUserProfile = new doctorModel({
+                _id:mongoose.Types.ObjectId()
+            })
+            savedUserProfile = await savedUserProfile.save()
+        }
+        else if(req.body.table_name==="patient"){
+            savedUserProfile = new patientModel({
                 _id:mongoose.Types.ObjectId()
             })
             savedUserProfile = await savedUserProfile.save()

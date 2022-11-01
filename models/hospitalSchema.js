@@ -8,7 +8,7 @@ const hospitalSchema = new mongoose.Schema({
     },
     subscription_history_id:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"subscription_history"
+        ref:"subscriptionHistory"
     },
     name:String,
     profile_img:{

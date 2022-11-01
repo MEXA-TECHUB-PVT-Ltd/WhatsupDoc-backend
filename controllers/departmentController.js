@@ -1,5 +1,6 @@
 
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
+const { ExportList } = require("twilio/lib/rest/bulkexports/v1/export");
 const departmentModel = require("../models/departmentsModel")
 const cloudinary = require("../utils/cloudinary")
 
@@ -312,6 +313,36 @@ exports.updateDepartment = async(req,res)=>{
             message: "Error occurred while updating department",
             error:err.message,
             statusCode:500
+        })
+    }
+    
+}
+
+exports.getDepartmentByHospitalId= async(req,res)=>{
+    try{
+        const hospital_id= req.params.hospital_id;
+
+        const result=await departmentModel.find({hospital_id:hospital_id});
+        if(result){
+            res.json({
+                message: "result fetched",
+                result:result,
+                statusCode:200
+            })
+        }
+        else{
+            res.json({
+                message: "result could not be fetched",
+                result:result,
+                statusCode:404
+            })
+        }
+
+    }
+    catch(err){
+        res.json({
+            message: "Error occurred while fetching",
+            error:err.message,
         })
     }
     

@@ -29,6 +29,7 @@ router.put("/updateDepartment" ,upload.fields([
         maxCount:100
     }
 ]), controller.updateDepartment)
+router.get("/getDepartmentsByHospitalId/:hospital_id" , controller.getDepartmentByHospitalId)
 
 // router.get("/getAllHospitals" , controller.getAllHospitals)
 // router.get("/getHospitalById/:hospital_id" , controller.getHospitalById)

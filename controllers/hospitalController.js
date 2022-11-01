@@ -31,57 +31,64 @@ exports.updateHospital = async (req,res)=>{
 
     try{
         
-        if(req.files.profile_img){
+        if(req.files){
+            if(req.files.profile_img){
             console.log(req.file)
-        const foundHospital= await hospitalModel.findOne({_id:hospital_id})
-        if(foundHospital){
-            if(foundHospital.profile_img.public_id){
-                await cloudinary.uploader.destroy(foundHospital.profile_img.public_id)
-               }
-               else{
-                console.log("did not found this user")
-               }
-        
-                const c_result= await cloudinary.uploader.upload(req.files.profile_img[0].path)
-                 var profile_img = {
-                     imgUrl:c_result.secure_url,
-                     public_id:c_result.public_id
-                 }
-                 
-                 console.log(profile_img)
-        }
-        
-        }
-
-        if(req.files.img.length>0){
-            console.log(req.files.img)
-        const foundHospital= await hospitalModel.findOne({_id:hospital_id})
-
-        if(foundHospital){
-            if(foundHospital.img.length>0){
-                let imagesArray = foundHospital.img;
-                imagesArray.forEach(element => {
-                    cloudinary.uploader.destroy(element.public_id)
-                });
-             }
-            else{
-                 console.log("images with this id not found")
+            const foundHospital= await hospitalModel.findOne({_id:hospital_id})
+            if(foundHospital){
+                if(foundHospital.profile_img.public_id){
+                    await cloudinary.uploader.destroy(foundHospital.profile_img.public_id)
+                   }
+                   else{
+                    console.log("did not found this user")
+                   }
+            
+                    const c_result= await cloudinary.uploader.upload(req.files.profile_img[0].path)
+                     var profile_img = {
+                         imgUrl:c_result.secure_url,
+                         public_id:c_result.public_id
+                     }
+                     
+                     console.log(profile_img)
             }
+            
+            }
+        }
+        
+
+
+        if(req.files){
+            if(req.files.img.length>0){
+                console.log(req.files.img)
+            const foundHospital= await hospitalModel.findOne({_id:hospital_id})
     
-            var pathsArray = [];
-            for (const file of req.files.img){
-                const {path}= file
-                const c_result = await cloudinary.uploader.upload(path)
-                 pathsArray.push({
-                   image_url: c_result.secure_url,
-                    public_id:c_result.public_id
-                 })
+            if(foundHospital){
+                if(foundHospital.img.length>0){
+                    let imagesArray = foundHospital.img;
+                    imagesArray.forEach(element => {
+                        cloudinary.uploader.destroy(element.public_id)
+                    });
+                 }
+                else{
+                     console.log("images with this id not found")
+                }
         
+                var pathsArray = [];
+                for (const file of req.files.img){
+                    const {path}= file
+                    const c_result = await cloudinary.uploader.upload(path)
+                     pathsArray.push({
+                       image_url: c_result.secure_url,
+                        public_id:c_result.public_id
+                     })
+            
+                }
+                console.log(pathsArray)
             }
-            console.log(pathsArray)
+            
+            }
         }
         
-        }
        
  
  
@@ -171,6 +178,7 @@ exports.updateHospital = async (req,res)=>{
      }
     
     catch(err){
+        console.log(err)
         res.json({
             message: "Error occurred while updating",
             error:err.message

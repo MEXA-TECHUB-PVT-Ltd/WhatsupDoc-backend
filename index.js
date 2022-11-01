@@ -43,6 +43,14 @@ app.use("/subscriptionHistory" , require("./routes/subscriptionHistoryRoute"))
 app.use("/department" , require("./routes/departmentRoute"))
 app.use("/doctor" , require("./routes/doctorRoute"))
 app.use("/workDay" , require("./routes/work_day_for_officeRoute"))
+app.use("/search" , require("./routes/searchRoute"))
+app.use("/work_day_for_office_timing" , require("./routes/workDayForOfficeTimingRoute"))
+app.use("/patient" , require("./routes/patientRoute"))
+app.use("/hospitalRating" , require("./routes/hospitalRatingRoute"))
+
+
+
+
 
 const server= app.listen(3000, function () {
     console.log("server started on port 3000")
