@@ -89,9 +89,7 @@ exports.updateHospital = async (req,res)=>{
             }
         }
         
-       
- 
- 
+    
 
           if(long && lat){
             const updateHospital = await hospitalModel.findOneAndUpdate(

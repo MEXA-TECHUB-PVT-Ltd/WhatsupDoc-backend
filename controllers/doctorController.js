@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const doctorModel= require("../models/doctorModel")
 const cloudinary= require("../utils/cloudinary")
 
+const sendNotification= require("../utils/notification")
 
 exports.createDoctor= async (req,res)=>{
     try{
@@ -190,11 +191,19 @@ exports.createDoctor= async (req,res)=>{
                 upsert:true
             })
 
+            let notificationSaveResponse={};
         if(result){
+
+                const isNotificationSaved= await sendNotification(result.hospital_id ,result._id , "New doctor added to your hospital." , "hospital" , "doctor" )
+                if(isNotificationSaved){
+                    notificationSaveResponse.message="Notification has been sent to hospital "
+                }
+                
             res.json({
                 message: "Doctor has been saved successfully",
                 result:result,
-                statusCode: 201
+                statusCode: 201,
+                notificationSaveResponse:notificationSaveResponse
             })
         }
         else{

@@ -11,7 +11,7 @@ const loginsModel = require("../models/loginsModel");
 const { request } = require("express");
 const doctorModel = require("../models/doctorModel")
 const patientModel= require("../models/patientModel")
-
+const sendNotification= require("../utils/notification")
 
 exports.register= async (req,res)=>{
 
@@ -66,14 +66,33 @@ exports.register= async (req,res)=>{
         })
 
         const registeredUser = await userRegister.save();
-
+        let notificationSaveResponse={};
         if(registeredUser){
             const token = jwt.sign({ _id: registeredUser._id }, process.env.TOKEN);
+
+            if(registeredUser.table_name==="hospital"){
+                const isNotificationSaved= await sendNotification("" ,registeredUser._id , "New hospital signed Up." , "admin" , "hospital" )
+                if(isNotificationSaved){
+                    notificationSaveResponse.message="Notification has been sent to admin"
+                }
+            }
+            if(registeredUser.table_name==="doctor"){
+                const isNotificationSaved= await sendNotification("" ,registeredUser._id , "New doctor signed Up." , "admin" , "doctor" )
+                if(isNotificationSaved){
+                    notificationSaveResponse.message="Notification has been sent to admin"
+                }
+                
+            }   
+            
+            
+            
+
             res.json({
                 message: "User has been Registered" ,
                 result:registeredUser,
                 statusCode:201,
-                token:token
+                token:token,
+                notificationSaveResponse:notificationSaveResponse,
             })
         }
         else{

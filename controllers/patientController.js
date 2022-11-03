@@ -11,7 +11,6 @@ exports.createPatient= async (req,res)=>{
         const city=req.body.city;
         const state = req.body.state;
         const gender = req.body.gender;
-        const age = req.body.age;
         const zip_code = req.body.zip_code;
         const country = req.body.country;
         const phone_no = req.body.phone_no;

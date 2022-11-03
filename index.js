@@ -47,6 +47,15 @@ app.use("/search" , require("./routes/searchRoute"))
 app.use("/work_day_for_office_timing" , require("./routes/workDayForOfficeTimingRoute"))
 app.use("/patient" , require("./routes/patientRoute"))
 app.use("/hospitalRating" , require("./routes/hospitalRatingRoute"))
+app.use("/doctorRating" , require("./routes/doctorRatingRoute"))
+app.use("/forgetPassword" , require("./routes/userForgetRoute"))
+app.use("/notification" , require("./routes/notificationRoute"))
+app.use("/appointmentHistory" , require("./routes/appointmentHistoryRoute"))
+app.use("/appointment" , require("./routes/appointmentRoute"))
+
+
+
+
 
 
 

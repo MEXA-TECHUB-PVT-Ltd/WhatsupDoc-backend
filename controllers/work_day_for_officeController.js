@@ -1,7 +1,9 @@
 
 const mongoose = require("mongoose");
 const { ExportConfigurationContext } = require("twilio/lib/rest/bulkexports/v1/exportConfiguration");
+const { castObject } = require("../models/work_day_for_officeModel");
 const work_day_for_officeModel= require("../models/work_day_for_officeModel")
+var ObjectId = require('mongodb').ObjectId;
 
 
 exports.createWorkDayForOffice = async (req,res)=>{
@@ -196,6 +198,75 @@ exports.getWorkDaysByDoctorId= async (req,res)=>{
     catch(err){
         res.json({
             message: "Error occurred",
+            error:err.message,
+        })
+    }
+}
+
+
+exports.getWorkDaysWithTiming=async (req,res)=>{
+    try{
+        let doc_id= req.query.doc_id;   
+        doc_id= new ObjectId(doc_id);     
+        const day = req.query.day;
+
+        const array = [];
+        
+        if(doc_id){
+            array.push(
+                {
+                    $match:{doc_id:doc_id}
+                },
+                {
+                    $lookup:{
+                        from:"work_day_for_office_timings",
+                        localField:"_id",
+                        foreignField:"work_id",
+                        as:"day_timings"
+                    }
+                }
+            )
+        }
+
+        if(doc_id && day){
+            array.push(
+                {
+                    $match:{doc_id:doc_id ,day:day}
+                },
+                {
+                    $lookup:{ 
+                        from:"work_day_for_office_timings",
+                        localField:"_id",
+                        foreignField:"work_id",
+                        as:"day_timings"
+                    }
+                }
+            )
+        }
+
+        const result = await work_day_for_officeModel.aggregate(array)
+
+        if(result){
+            res.json({
+                message: "Result fetched",
+                result: result,
+                statusCode:200
+            })
+        }
+        else{
+            res.json({
+                message: "could not fetched",
+                result: null
+            })
+        }
+
+
+
+    }
+    catch(err)
+    {
+        res.json({
+            message: "error occurred while processing",
             error:err.message,
         })
     }
