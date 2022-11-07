@@ -3,8 +3,10 @@ const  mongoose = require('mongoose')
 const appointmentModel= require('../models/appointmentModel');
 const cloudinary = require("../utils/cloudinary")
 const other_patient_details= require("../models/other_patient_detailsModel")
+const sendNotification= require("../utils/notification")
 
 exports.createAppointment = async (req,res)=>{
+    const notificationSaveResponse={};
 
 
 
@@ -76,9 +78,16 @@ exports.createAppointment = async (req,res)=>{
             const result = await savedAppointment.save();
 
             if(result){
+
+                const isNotificationSaved= await sendNotification(savedAppointment.doctor_id ,savedAppointment.bookedby_patient_id , "New Patient Booked an appointment with You" , "doctor" , "patient" )
+                if(isNotificationSaved){
+                    notificationSaveResponse.message="Notification has been sent to doctor"
+                }
+
                 res.json({
                     message: "appointment saved successfully",
                     result: result,
+                    notificationSaveResponse: notificationSaveResponse,
                     statusCode:201
                 })
             }
@@ -154,9 +163,16 @@ exports.createAppointment = async (req,res)=>{
             const result = await savedAppointment.save();
 
             if(result){
+
+                const isNotificationSaved= await sendNotification(savedAppointment.doctor_id ,savedAppointment.bookedby_patient_id , "New Patient Booked an appointment with You" , "doctor" , "patient" )
+                if(isNotificationSaved){
+                    notificationSaveResponse.message="Notification has been sent to doctor"
+                }
+
                 res.json({
                     message: "appointment saved successfully",
                     result: result,
+                    notificationSaveResponse:notificationSaveResponse,
                     statusCode:201
                 })
             }
@@ -316,6 +332,10 @@ exports.getAllAppointmentsOfPatient = async (req,res)=>{
 exports.changeAppointmentStatus = async (req , res) =>{
 
     try{
+
+        const notificationSaveResponse={};
+        const notificationCancelledResponse={}
+
         const appointment_id= req.body.appointment_id;
         const status = req.body.status;
         const review = req.body.review;
@@ -333,9 +353,38 @@ exports.changeAppointmentStatus = async (req , res) =>{
         )
         
         if(result){
+
+            if(status==="cancelled"){
+                const isNotificationSaved= await sendNotification(result.doctor_id ,result.bookedby_patient_id , "Patient cancelled appointment with you" , "doctor" , "patient" )
+                if(isNotificationSaved){
+                    notificationCancelledResponse.message="Notification has been sent to doctor"
+                }
+            }
+            if(review && !rating_stars){
+                const isNotificationSaved= await sendNotification(result.doctor_id ,result.bookedby_patient_id , "Patient has added review for appointment" , "doctor" , "patient" )
+                if(isNotificationSaved){
+                    notificationSaveResponse.message="Notification has been sent to doctor"
+                }
+            }
+            else if(rating_stars && ! review){
+                const isNotificationSaved= await sendNotification(result.doctor_id ,result.bookedby_patient_id , "patient has rated Appointment" , "doctor" , "patient" )
+                if(isNotificationSaved){
+                    notificationSaveResponse.message="Notification has been sent to doctor"
+                }
+            }
+            else if(review && rating_stars){
+                const isNotificationSaved= await sendNotification(result.doctor_id ,result.bookedby_patient_id , "Patient has added review and rating for appointment" , "doctor" , "patient" )
+                if(isNotificationSaved){
+                    notificationSaveResponse.message="Notification has been sent to doctor"
+                }
+            }
+
+
             res.json({
                 message:  `status has been changed to ${status}`,
                 result:result,
+                notificationSaveResponse:notificationSaveResponse,
+                notificationCancelledResponse:notificationCancelledResponse,
                 statusCode:200
             })
         }
@@ -357,7 +406,7 @@ exports.changeAppointmentStatus = async (req , res) =>{
 
 exports.deleteAppointment = async (req , res) =>{
     try{
-        const appointment_id= req.body.appointment_id;
+        const appointment_id= req.query.appointment_id;
         const result = await appointmentModel.deleteOne({_id: appointment_id});        
         if(result.deletedCount>0){
             res.json({
@@ -380,3 +429,193 @@ exports.deleteAppointment = async (req , res) =>{
     }
 }
 
+exports.updateAppointment = async (req,res)=>{
+    try{
+        const appointment_id=req.body.appointment_id;
+        const bookedby_patient_id= req.body.bookedby_patient_id;
+        const type_of_work = req.body.type_of_work;
+        const for_yourself= req.body.for_yourself;
+        const disease = req.body.disease;
+        const description= req.body.description;
+        const for_other = req.body.for_other;
+        const status = req.body.status;
+        const name = req.body.name;
+        const gender = req.body.gender;
+        const age = req.body.age;
+        const relation_with_patient = req.body.relation_with_patient;
+
+        
+
+        const foundAppointment = await appointmentModel.findOne({_id:appointment_id});
+
+
+
+
+        if(for_other && for_yourself && status && bookedby_patient_id){
+            if(for_yourself=="true" && for_other=="false"){
+                console.log(for_yourself)
+                    //images uploading to cloudinary
+                    if(req.files){
+                        if(foundAppointment){
+                            if(foundAppointment.images){
+                                if(foundAppointment.images.length>0){
+                                    foundAppointment.images.forEach(element =>{
+                                        cloudinary.uploader.destroy(element.public_id)
+                                    })
+                                }
+                            }
+                            else{
+                                console.log("images not found for this appointment")
+                            }
+                        }
+    
+                        if(req.files.length > 0){
+                            console.log(req.files)
+                                var pathsArray = [];
+                                for (const file of req.files){
+                                    const {path}= file
+                                    const c_result = await cloudinary.uploader.upload(path)
+                                     pathsArray.push({
+                                        imgUrl: c_result.secure_url,
+                                        public_id:c_result.public_id
+                                     })
+                            
+                                }
+                                console.log(pathsArray)
+                            }
+                    }
+    
+                    const result = await appointmentModel.findOneAndUpdate({_id:appointment_id}
+                        ,
+                        {
+                        bookedby_patient_id:bookedby_patient_id,
+                        type_of_work:type_of_work,
+                        for_yourself:for_yourself,
+                        disease:disease,
+                        description:description,
+                        images:pathsArray,
+                        for_other:for_other,
+                        status:status
+                        },
+                        {
+                            new:true
+                        }
+                        )
+    
+                        if(result){
+                            res.json({
+                                message: "Appointment updated successfully",
+                                result:result,
+                                statusCode:201
+                            })
+                        }
+                        else{
+                            res.json({
+                                message: "Appointment  could not be updated "
+                            })
+                        }
+            }
+            else if(for_yourself=="false" && for_other=="true"){    
+                console.log("inside else if")  
+                    //images uploading to cloudinary
+                    if(req.files){
+                        if(foundAppointment){
+                            if(foundAppointment.images){
+                                if(foundAppointment.images.length>0){
+                                    foundAppointment.images.forEach(element =>{
+                                        cloudinary.uploader.destroy(element.public_id)
+                                    })
+                                }
+                            }
+                            else{
+                                console.log("images not found for this appointment")
+                            }
+                        }
+    
+                        if(req.files.length > 0){
+                            console.log(req.files)
+                                var pathsArray = [];
+                                for (const file of req.files){
+                                    const {path}= file
+                                    const c_result = await cloudinary.uploader.upload(path)
+                                     pathsArray.push({
+                                        imgUrl: c_result.secure_url,
+                                        public_id:c_result.public_id
+                                     })
+                            
+                                }
+                                console.log(pathsArray)
+                            }
+                    }
+    
+    
+                    const otherPatient= new other_patient_details({
+                        _id:mongoose.Types.ObjectId(),
+                        name:name,
+                        gender:gender,
+                        age:age,
+                        relation_with_patient:relation_with_patient
+                    })
+            
+                    const saveOtherPatientDetails = await otherPatient.save();
+                    if(saveOtherPatientDetails){
+                        var other_patient_id = saveOtherPatientDetails._id;
+                    }
+            
+    
+                    const result= await appointmentModel.findOneAndUpdate({_id: appointment_id}
+                        ,
+                        {
+                            bookedby_patient_id:bookedby_patient_id,
+                            type_of_work:type_of_work,
+                            for_yourself:for_yourself,
+                            disease:disease,
+                            description:description,
+                            images:pathsArray,
+                            for_other:for_other,
+                            status:status,
+                            other_patient_id,other_patient_id
+                        },
+                        {
+                            new:true
+                        }
+                        )
+    
+                        if(result){
+                            res.json({
+                                message: "appointment updated successfully",
+                                statusCode:201,
+                                result:result
+    
+                            })
+                        }
+                        else{
+                            res.json({
+                                message: "Appointment could not be updated successfully"
+                            })
+                        }
+            }
+            else{
+                console.log("IN no one")
+            }
+            
+        }
+        else{
+            res.json({
+                message:"for_other, for_yourself , status ,bookedby_patient_id , cannot be empty"
+            })
+        }
+        
+        
+
+        
+
+    }
+    catch(err){
+        res.json({
+            message:"Error occurred While updating",
+            error:err.message,
+            statusCode:500
+        })
+    }
+}

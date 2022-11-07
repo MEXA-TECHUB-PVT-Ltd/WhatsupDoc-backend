@@ -62,6 +62,7 @@ exports.register= async (req,res)=>{
         table_name:req.body.table_name,
         user_name:req.body.user_name,
         email:req.body.email,
+        online_status:req.body.online_status,
         password:hashPassword,
         })
 
@@ -228,19 +229,19 @@ exports.deleteUser = async(req, res)=>{
 }
 
 
-exports.updateUser = (req,res)=>{
+exports.updateUser = async (req,res)=>{
     try{
         const user_id = req.body.user_id
         const email = req.body.email
-        const password = req.body.password
-        const onlineStatus = req.body.online_status
+        const onlineStatus = req.body.onlineStatus
         const status= req.body.status
 
+
+        
 
         loginModel.findOneAndUpdate({user_id:user_id},
             {
                 email:email,
-                password:password,
                 onlineStatus:onlineStatus,
                 status:status
             },
@@ -273,12 +274,50 @@ exports.updateUser = (req,res)=>{
     }
 }
 
+exports.updatePassword =async (req,res)=>{
+    try{
+        const email = req.body.email;
+
+        const salt = await bcrypt.genSalt(10);
+        const hashPassword = await bcrypt.hash(req.body.password, salt);
+
+
+        const result = await loginsModel.findOneAndUpdate({email: email} ,
+            {
+                password:hashPassword
+            },
+            {
+                new:true
+            }) 
+
+            if(result){
+                res.json({
+                    message: "Password has been updated",
+                    result:result
+            })
+            }
+            else{
+                res.json({
+                    message: "Password could not be updated successfully",
+                    result:resul
+                })
+            }
+    }
+    catch(err){
+        res.json({
+            message: "Error occurred while updating passwords",
+            error:err.message
+        })
+    }
+}
+
 
 const registerSchema = Joi.object({
   table_name: Joi.string(),
   user_name: Joi.string(),
   email: Joi.string().min(6).required().email(),
   password: Joi.string().min(6).required(),
+  online_status:Joi.boolean()
 });
 
 const loginSchema = Joi.object({

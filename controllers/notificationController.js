@@ -3,11 +3,58 @@ const notificationModel= require("../models/notificationModel");
 const notification = require('../utils/notification');
 var ObjectId = require('mongodb').ObjectId;
 
+
+exports.createNotification= async (req,res)=>{
+    try{
+        const to= req.body.to;
+        const from = req.body.from;
+        const details = req.body.details;
+        const table_name_to = req.body.table_name_to;
+        const table_name_from = req.body.table_name_from;
+
+        const newNotification = new notificationModel({
+            _id:mongoose.Types.ObjectId(),
+            to:to,
+            from:from,
+            details:details,
+            table_name_to:table_name_to,
+            table_name_from :table_name_from,
+
+        })
+
+        const result = await newNotification.save();
+
+        if(result){
+            res.json({
+                message: "Notification saved successfully",
+                result:result,
+                statusCode: 201
+                
+            })
+        }
+        else{
+            res.json({
+                message: "Notification could not be saved successfully",
+                result:null,
+                statusCode:400
+            })
+        }
+
+
+    }
+    catch(err){
+        res.json({
+            message: "Error ",
+            error:err.message
+        })
+    }
+}
+
+
+
 exports.getAllNotifications = async (req,res)=>{
 
     try{  
-
-    
     
     let result = notificationModel.aggregate([
         {
@@ -30,7 +77,7 @@ exports.getAllNotifications = async (req,res)=>{
         }, 
         {
             $lookup:{
-                from: "patient",
+                from: "patients",
                 localField:"from",
                 foreignField:"_id",
                 as : "from_patient-info"
@@ -96,7 +143,7 @@ exports.getNotificationByReceiverId = async (req,res)=>{
             }, 
             {
                 $lookup:{
-                    from: "patient",
+                    from: "patients",
                     localField:"from",
                     foreignField:"_id",
                     as : "from_patient-info"

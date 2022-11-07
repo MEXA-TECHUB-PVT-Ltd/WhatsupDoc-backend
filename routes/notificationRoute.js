@@ -9,6 +9,8 @@ router.post("/getNotificationByReceiverId" , controller.getNotificationByReceive
 router.put("/changeNotificationStatus" , controller.changeNotificationStatus)
 router.put("/changeAllNotificationStatus" , controller.changeAllNotificationStatus)
 router.delete("/deleteNotification/:notification_id" , controller.deleteNotification)
+router.post("/createNotification/" , controller.createNotification)
+
 
 
 
