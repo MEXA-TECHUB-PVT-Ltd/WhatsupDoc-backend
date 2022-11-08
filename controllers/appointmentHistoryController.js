@@ -6,8 +6,8 @@ exports.createAppointmentHistory= async(req,res)=>{
     try{
         const appointment_id = req.body.appointment_id;
         const transaction_id = req.body.transaction_id;
-        const table_name_to= req.body.table_name;
-        const table_name_from= req.body.table_name;
+        const table_name_to= req.body.table_name_to;
+        const table_name_from= req.body.table_name_from;
         const transaction_status = req.body.transaction_status;
 
         const appointment_history = new appointment_historyModel({
@@ -149,7 +149,7 @@ exports.getAppointmentHistoryByAppointmentHistoryId= async(req,res)=>{
 
 exports.deleteAppointmentHistory = async (req ,res)=>{
     try{
-        const appointment_history_id =req.body.appointment_history_id;
+        const appointment_history_id =req.params.appointment_history_id;
         const result= await appointment_historyModel.deleteOne({_id:appointment_history_id});
         if(result.deletedCount>0){
             res.json({
@@ -170,16 +170,16 @@ exports.deleteAppointmentHistory = async (req ,res)=>{
     }
 }
 
-exports.updateAppointmentHistory = (req,res)=>{
+exports.updateAppointmentHistory = async (req,res)=>{
     try{
         const appointment_history_id= req.body.appointment_history_id;
         const appointment_id = req.body.appointment_id;
         const transaction_id = req.body.transaction_id;
-        const table_name_to= req.body.table_name;
-        const table_name_from= req.body.table_name;
+        const table_name_to= req.body.table_name_to;
+        const table_name_from= req.body.table_name_from;
         const transaction_status = req.body.transaction_status;
 
-        const result =  appointment_historyModel.findOneAndUpdate({_id:appointment_history_id} , 
+        const result = await appointment_historyModel.findOneAndUpdate({_id:appointment_history_id} , 
             {
                 appointment_id:appointment_id,
                 transaction_id:transaction_id,
@@ -209,6 +209,7 @@ exports.updateAppointmentHistory = (req,res)=>{
         
     }
     catch(err){
+        console.log(err)
         res.json({
             message: "error occurred",
             error:err.message

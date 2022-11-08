@@ -8,9 +8,18 @@ const appointmentHistorySchema= new mongoose.Schema({
         ref:"appointment"
     },
     transaction_id:String,
-    table_name_to:String,
-    table_name_from:String,
-    transaction_status:String,
+    table_name_to:{
+        type:String,
+        enum:["hospital", "patient","doctor" , "admin"],
+    },
+    table_name_from:{
+        type:String,
+        enum:["hospital", "patient","doctor" , "admin"],
+    },
+    transaction_status:{
+        type:String,
+        enum:["success", "failed"],
+    },
 
 })
 
