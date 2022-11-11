@@ -64,7 +64,7 @@ exports.getAllHospitalTypes = async (req,res)=>{
 exports.getHospitalTypeById = async (req,res)=>{
     try{
         const hospitalTypeId= req.params.hospitalTypeId;
-        const result = await hospitalTypeModel.find({_id:hospitalTypeId});
+        const result = await hospitalTypeModel.findOne({_id:hospitalTypeId});
 
         if(result){
             res.json({

@@ -12,13 +12,48 @@ exports.Search = async (req,res)=>{
         const type=req.query.type;
 
         if(type==="hospital"){
-            const result = await hospitalModel.find({
-                $or: [
-                    {name:{$regex:text}},
-                    {locationAddress:{$regex:text}}
-                    
-                  ]
-                }).populate("hospital_type_id").populate("subscription_history_id")
+            const result = await hospitalModel.aggregate([
+                {
+                    $lookup:{
+                        from:"departments",
+                        localField:"_id",
+                        foreignField:"hospital_id",
+                        as:"Hospital_departments"
+                    }
+                },
+                {
+                    $match:{
+                        $or: [
+                            {city:{$regex:text , $options: 'i',}},
+                            {name:{$regex:text , $options: 'i'}},
+                            {locationAddress:{$regex:text , $options: 'i'}},
+                            {"Hospital_departments": {
+                                "$elemMatch": {
+                                    "name": {$regex:text , $options: 'i'}
+                                }
+                              }}
+
+                          ]
+                    }
+                },
+                {
+                    $lookup:{
+                        from:"hospital_types",
+                        localField:"hospital_type_id",
+                        foreignField:"_id",
+                        as : "hospital_type_details"
+                    }
+                }
+                ,
+                {
+                    $lookup:{
+                        from:"subscriptionhistories",
+                        localField:"subscription_history_id",
+                        foreignField:"_id",
+                        as : "subscription_history_details"
+                    }
+                }
+            ])
             if(result){
                 res.json({
                     message: "hospitals found:",

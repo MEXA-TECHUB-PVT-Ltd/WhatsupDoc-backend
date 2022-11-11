@@ -21,7 +21,10 @@ exports.register= async (req,res)=>{
         //Check if the user is already in the db
         const emailExists = await loginsModel.findOne({ email: req.body.email });
   
-        if (emailExists) return res.status(400).send("Email already exists");
+        if (emailExists) return res.status(400).json({
+            message: "Email already exists",
+            status:'failed'
+        })
   
         //hash passwords
         const salt = await bcrypt.genSalt(10);
@@ -123,11 +126,17 @@ exports.login = async (req,res)=>{
   
     const user = await loginsModel.findOne({ email: req.body.email });
   
-    if (!user) return res.status(400).send("Email or password is wrong");
+    if (!user) return res.status(400).json({
+        message: "Email or Password is incorrect",
+        status:"failed"
+    });
   
     const validPass = await bcrypt.compare(req.body.password, user.password);
 
-    if (!validPass) return res.status(400).send("Email or password is wrong");
+    if (!validPass) return res.status(400).json({
+        message: "Email or Password is incorrect",
+        status:"failed"
+    });;
 
     const token = jwt.sign({ _id: user.user_id}, process.env.TOKEN);
 
