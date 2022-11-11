@@ -54,6 +54,8 @@ app.use("/notification" , require("./routes/notificationRoute"))
 app.use("/appointmentHistory" , require("./routes/appointmentHistoryRoute"))
 app.use("/appointment" , require("./routes/appointmentRoute"))
 app.use("/otherPatientDetails" , require("./routes/other_patient_detailRoute"))
+app.use("/privacyPolicy" , require("./routes/privacyPolicyRoute"))
+
 
 app.use("/chat", require("./routes/ChatRoute"));
 app.use("/message", require("./routes/MessageRoute"));

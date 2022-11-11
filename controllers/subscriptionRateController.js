@@ -44,7 +44,7 @@ exports.createSubscription =async (req,res)=>{
 exports.getAllSubscriptions = async (req,res)=>{
 
     try{
-        const result = await subscriptionRateModel.findOne({});
+        const result = await subscriptionRateModel.find({});
     if(result){
         res.json({
             message: "all subscription fetched",
