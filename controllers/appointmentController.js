@@ -27,13 +27,16 @@ exports.createAppointment = async (req,res)=>{
     const age = req.body.age;
     const relation_with_patient = req.body.relation_with_patient;
 
+    let currentDate = new Date(Date.now());
+    currentDate= currentDate.toLocaleDateString("en-CA");
+
 
     console.log(for_yourself,for_other , status, bookedby_patient_id, doctor_id)
     
     if(for_other && for_yourself && status && bookedby_patient_id && doctor_id && work_day_for_office_id &&work_day_for_office_timing_id ){
 
     const foundResult= await  appointmentModel.findOne({work_day_for_office_id:work_day_for_office_id , doctor_id:doctor_id , 
-    work_day_for_office_timing_id:work_day_for_office_timing_id,  status:'scheduled' });
+    work_day_for_office_timing_id:work_day_for_office_timing_id,  status:'scheduled' , createdAt: currentDate});
 
     
 

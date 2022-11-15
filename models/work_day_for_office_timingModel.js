@@ -12,7 +12,15 @@ const work_day_for_office_timingSchema = new mongoose.Schema ({
         type:String
     },
     end_time:{
-        String
+        type:String
+    },
+    start_time_state:{
+        type:String,
+        enum:["am" , "pm"]
+    },
+    end_time_state:{
+        type:String,
+        enum:["am" , "pm"]
     },
     type_of_work:{
         type:String,
