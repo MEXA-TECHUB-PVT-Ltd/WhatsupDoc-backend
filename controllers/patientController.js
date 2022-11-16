@@ -22,6 +22,7 @@ exports.createPatient= async (req,res)=>{
         const major_disease = req.body.major_disease;
         const social_security_no = req.body.social_security_no;
         const profession_status = req.body.profession_status;
+        const age = req.body.age;
 
         var foundResult= await patientModel.findOne({_id:patient_id})
         if(req.files){
@@ -57,33 +58,65 @@ exports.createPatient= async (req,res)=>{
  //-----------------------------------------------------------------------------------------
         }
         
-        const result = await patientModel.findOneAndUpdate({_id:patient_id} , 
-            
-            {
-                name:name,
-                img:profile_img,
-                phone_no:phone_no,
-                gender:gender,
-                city:city,
-                state:state,
-                zip_code:zip_code,
-                country:country,
-                street_address:street_address,
-                locationAddress:locationAddress,
-                $set:{
-                    "location.coordinates":[long,lat]
-                },
-                health_condition:health_condition,
-                major_disease:major_disease,
-                social_security_no:social_security_no,
-                profession_status:profession_status
 
-            }
-            ,
-            {
-                new:true,
-                upsert:true
-            })
+        if(long && lat){
+            var result = await patientModel.findOneAndUpdate({_id:patient_id} , 
+            
+                {
+                    name:name,
+                    img:profile_img,
+                    phone_no:phone_no,
+                    gender:gender,
+                    city:city,
+                    state:state,
+                    zip_code:zip_code,
+                    country:country,
+                    street_address:street_address,
+                    locationAddress:locationAddress,
+                    $set:{
+                        "location.coordinates":[long,lat]
+                    },
+                    health_condition:health_condition,
+                    major_disease:major_disease,
+                    social_security_no:social_security_no,
+                    profession_status:profession_status,
+                    age:age
+    
+                }
+                ,
+                {
+                    new:true,
+                    upsert:true
+                })
+        }
+        else{
+            var result = await patientModel.findOneAndUpdate({_id:patient_id} , 
+            
+                {
+                    name:name,
+                    img:profile_img,
+                    phone_no:phone_no,
+                    gender:gender,
+                    city:city,
+                    state:state,
+                    zip_code:zip_code,
+                    country:country,
+                    street_address:street_address,
+                    locationAddress:locationAddress,
+                    health_condition:health_condition,
+                    major_disease:major_disease,
+                    social_security_no:social_security_no,
+                    profession_status:profession_status,
+                    age:age
+    
+                }
+                ,
+                {
+                    new:true,
+                    upsert:true
+                })
+        }
+        
 
         if(result){
             res.json({

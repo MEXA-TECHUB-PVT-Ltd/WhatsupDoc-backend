@@ -15,21 +15,20 @@ exports.createWorkDayForOfficeTiming = async (req,res)=>{
 
 
       
-        let moment_start_time = moment(start_time,'HH:mm:ss a')
-        let moment_end_time = moment(end_time , 'HH:mm:ss a')
+        let moment_start_time = moment(start_time,'hh:mm:ss a')
+        let moment_end_time = moment(end_time , 'hh:mm:ss a')
         console.log(moment_start_time)
         var bool=false;
 
         const foundResult = await work_day_for_office_timingModel.find({work_id:work_id});
 
         for (let element of foundResult) {
-            let start= moment(element.start_time, 'HH:mm:ss a')
-            let end= moment(element.end_time, 'HH:mm:ss a')
+            let start= moment(element.start_time, 'hh:mm:ss a')
+            let end= moment(element.end_time, 'hh:mm:ss a')
 
-            if((moment_start_time.isBetween(start , end) || moment_end_time.isBetween(start,end) || moment_start_time.isSame(start)) || moment_end_time.isSame(end)){
-                
+            if((moment_start_time.isBetween(start , end) || moment_end_time.isBetween(start,end) || moment_start_time.isSame(start)) || moment_end_time.isSame(end) ||(moment_start_time.isBefore(start) && moment_end_time.isAfter(end))){
                 bool=true;
-                break;
+                break; 
                 
             }
             else{
@@ -71,7 +70,9 @@ exports.createWorkDayForOfficeTiming = async (req,res)=>{
         }
         else{
             res.json({
-                message: "The starting time or ending time you selected is already in between some other slot"
+                message: "Time slot conflict . Please ensure that time range you selected is not in between of some other slot Or some other slot is not in between your selected range , ",
+                status:"failed",
+
             })
         }
         

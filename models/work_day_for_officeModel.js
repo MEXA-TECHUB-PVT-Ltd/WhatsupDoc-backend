@@ -10,7 +10,8 @@ const work_day_for_officeSchema = new mongoose.Schema ({
     },
     day:{
         type:String,
-        enum:["sunday" , "monday" , "tuesday" , "wednesday" , "thursday" , "friday" , "saturday"]
+        enum:["sunday" , "monday" , "tuesday" , "wednesday" , "thursday" , "friday" , "saturday"],
+        unique:true
     },
     type_of_work:{
         type:String,

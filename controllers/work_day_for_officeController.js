@@ -39,7 +39,8 @@ exports.createWorkDayForOffice = async (req,res)=>{
     }
     catch(err){
         res.json({
-            message: "Error occurred while creating work day"
+            message: "Error occurred while creating work day",
+            error:err.message,
         })
     }
 
