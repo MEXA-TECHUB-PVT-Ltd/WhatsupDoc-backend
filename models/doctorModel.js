@@ -7,6 +7,10 @@ const doctorSchema = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"hospital"
     },
+    department_id:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"department"
+    },
     profile_img:{
         type:Object
     },
