@@ -8,7 +8,11 @@ const work_day_for_officeSchema = new mongoose.Schema ({
         type:mongoose.Schema.Types.ObjectId,
         ref:"doctor"
     },
-    day:String,
+    day:{
+        type:String,
+        enum:["sunday" , "monday" , "tuesday" , "wednesday" , "thursday" , "friday" , "saturday"],
+        unique:true
+    },
     type_of_work:{
         type:String,
         enum:["onsite" , "video"]

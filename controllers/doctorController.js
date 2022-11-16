@@ -19,6 +19,7 @@ exports.createDoctor= async (req,res)=>{
         const experience = req.body.experience;
         const phone_no = req.body.phone_no;
         const paypal_email=req.body.paypal_email;
+        const department_id = req.body.department_id;
 
         var foundResult= await doctorModel.findOne({_id:doctor_id})
         if(req.files){
@@ -184,6 +185,7 @@ exports.createDoctor= async (req,res)=>{
             id_card_photo_back:id_card_photo_back,
             phone_no:phone_no,
             paypal_email:paypal_email,
+            department_id:department_id,
             }
             ,
             {
@@ -228,7 +230,7 @@ exports.createDoctor= async (req,res)=>{
 exports.getAllDoctors = async(req,res)=>{
     
     try{
-        const result = await doctorModel.find({}).populate("hospital_id").populate("subscription_history_id")
+        const result = await doctorModel.find({}).populate("hospital_id").populate("subscription_history_id").populate("department_id");
 
         if(result){
             res.json({
@@ -256,7 +258,7 @@ exports.getDoctorById = async(req,res)=>{
     
     try{
         const doctor_id = req.params.doctor_id;
-        const result = await doctorModel.find({_id:doctor_id}).populate("hospital_id").populate("subscription_history_id")
+        const result = await doctorModel.find({_id:doctor_id}).populate("hospital_id").populate("subscription_history_id").populate("department_id")
 
         if(result){
             res.json({

@@ -39,7 +39,8 @@ exports.createWorkDayForOffice = async (req,res)=>{
     }
     catch(err){
         res.json({
-            message: "Error occurred while creating work day"
+            message: "Error occurred while creating work day",
+            error:err.message,
         })
     }
 
@@ -232,6 +233,76 @@ exports.getWorkDaysWithTiming=async (req,res)=>{
             array.push(
                 {
                     $match:{doc_id:doc_id ,day:day}
+                },
+                {
+                    $lookup:{ 
+                        from:"work_day_for_office_timings",
+                        localField:"_id",
+                        foreignField:"work_id",
+                        as:"day_timings"
+                    }
+                }
+            )
+        }
+
+        const result = await work_day_for_officeModel.aggregate(array)
+
+        if(result){
+            res.json({
+                message: "Result fetched",
+                result: result,
+                statusCode:200
+            })
+        }
+        else{
+            res.json({
+                message: "could not fetched",
+                result: null
+            })
+        }
+
+
+
+    }
+    catch(err)
+    {
+        res.json({
+            message: "error occurred while processing",
+            error:err.message,
+        })
+    }
+}
+
+exports.getWorkDaysWithTimingAndTypeOfWork=async (req,res)=>{
+    try{
+        let doc_id= req.query.doc_id;   
+        doc_id= new ObjectId(doc_id);     
+        const day = req.query.day;
+        const type_of_work = req.query.type_of_work;
+        console.log(type_of_work)
+
+        const array = [];
+        
+        if(doc_id && type_of_work){
+            array.push(
+                {
+                    $match:{doc_id:doc_id , type_of_work:type_of_work}
+                },
+                {
+                    $lookup:{
+                        from:"work_day_for_office_timings",
+                        localField:"_id",
+                        foreignField:"work_id",
+                        as:"day_timings"
+                    }
+                }
+            )
+        }
+
+        if(doc_id && day && type_of_work){
+            array.push(
+                {
+                    $match:{doc_id:doc_id ,day:day , type_of_work:type_of_work}
                 },
                 {
                     $lookup:{ 

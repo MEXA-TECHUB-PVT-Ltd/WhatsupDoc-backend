@@ -32,6 +32,7 @@ const patientSchema= new mongoose.Schema({
      major_disease:Boolean,
      social_security_no:String,
      profession_status:Boolean, 
+     age:Number
 })
 
 module.exports= mongoose.model("patient" , patientSchema)

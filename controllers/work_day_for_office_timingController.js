@@ -1,35 +1,81 @@
 
 const mongoose = require("mongoose")
 const work_day_for_office_timingModel= require("../models/work_day_for_office_timingModel")
+const moment = require('moment');
 
 exports.createWorkDayForOfficeTiming = async (req,res)=>{
 
     try{
         const work_id=req.body.work_id;
-        const start_time=req.body.start_time;
-        const end_time=req.body.end_time;
-        const newWorkDayOfficeTiming = new work_day_for_office_timingModel({
-            _id:mongoose.Types.ObjectId(),
-            work_id:work_id,
-            start_time:start_time,
-            end_time:end_time
-        })
+        let start_time=req.body.start_time;
+        let end_time=req.body.end_time;
+        const start_time_state = req.body.start_time_state;
+        const end_time_state = req.body.end_time_state;
+        console.log(end_time);
 
-        const result = await newWorkDayOfficeTiming.save();
-        if(result){
-            res.json({
-                message: "New work day for office timing has been created",
-                result: result,
-                statusCode:201
+
+      
+        let moment_start_time = moment(start_time,'hh:mm:ss a')
+        let moment_end_time = moment(end_time , 'hh:mm:ss a')
+        console.log(moment_start_time)
+        var bool=false;
+
+        const foundResult = await work_day_for_office_timingModel.find({work_id:work_id});
+
+        for (let element of foundResult) {
+            let start= moment(element.start_time, 'hh:mm:ss a')
+            let end= moment(element.end_time, 'hh:mm:ss a')
+
+            if((moment_start_time.isBetween(start , end) || moment_end_time.isBetween(start,end) || moment_start_time.isSame(start)) || moment_end_time.isSame(end) ||(moment_start_time.isBefore(start) && moment_end_time.isAfter(end))){
+                bool=true;
+                break; 
+                
+            }
+            else{
+                console.log("not in between")
+            }
+        };
+        
+
+
+       
+
+        if(bool===false){
+            const newWorkDayOfficeTiming = new work_day_for_office_timingModel({
+                _id:mongoose.Types.ObjectId(),
+                work_id:work_id,
+                start_time:start_time,
+                end_time:end_time,
+                start_time_state:start_time_state,
+                end_time_state:end_time_state
             })
+    
+    
+    
+            const result = await newWorkDayOfficeTiming.save();
+            if(result){
+                res.json({
+                    message: "New work day for office timing has been created",
+                    result: result,
+                    statusCode:201
+                })
+            }
+            else{
+                res.json({
+                    message: "work day could not be created",
+                    result: result,
+                    statusCode:404
+                })
+            }
         }
         else{
             res.json({
-                message: "work day could not be created",
-                result: result,
-                statusCode:404
+                message: "Time slot conflict . Please ensure that time range you selected is not in between of some other slot Or some other slot is not in between your selected range , ",
+                status:"failed",
+
             })
         }
+        
     }
     catch(err){
         res.json({
@@ -113,13 +159,19 @@ exports.updateWorkDayForOfficeTiming = async (req,res)=>{
         const work_id=req.body.work_id;
         const start_time=req.body.start_time;
         const end_time=req.body.end_time;
+        const start_time_state = req.body.start_time_state;
+        const end_time_state = req.body.end_time_state
+
+
 
         const result = await work_day_for_office_timingModel.findOneAndUpdate({_id:workDayOfficeTimingId}
             ,
             {
             work_id:work_id,
             start_time:start_time,
-            end_time:end_time
+            end_time:end_time,
+            start_time_state:start_time_state,
+            end_time_state:end_time_state,
             },
             {
                 new:true

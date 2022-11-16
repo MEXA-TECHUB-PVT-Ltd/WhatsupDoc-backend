@@ -9,8 +9,8 @@ const subscriptionHistory = new mongoose.Schema({
     },
     month_name:{
         type:String,
-        enum:["January","February","March","April","May","June","July",
-        "August","September","October","November","December"]
+        enum:["january","february","march","april","may","june","july",
+        "august","september","october","november","december"]
     },
     transaction_id:{
         type:String

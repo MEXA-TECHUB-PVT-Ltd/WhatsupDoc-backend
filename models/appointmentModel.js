@@ -39,8 +39,18 @@ const appointment_Schema = new mongoose.Schema({
     ,
     review:String,
     rating_stars:String,
+    createdAt:{
+        type:String,
+        default:date()
+    }
 
-
-})
+},)
 
 module.exports = mongoose.model("appointment" , appointment_Schema);
+
+
+function date(){
+    const currentDate = new Date(Date.now());
+    return  currentDate.toLocaleDateString('en-CA')
+
+}

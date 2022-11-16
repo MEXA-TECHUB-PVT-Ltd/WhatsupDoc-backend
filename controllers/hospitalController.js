@@ -58,35 +58,38 @@ exports.updateHospital = async (req,res)=>{
 
 
         if(req.files){
-            if(req.files.img.length>0){
-                console.log(req.files.img)
-            const foundHospital= await hospitalModel.findOne({_id:hospital_id})
-    
-            if(foundHospital){
-                if(foundHospital.img.length>0){
-                    let imagesArray = foundHospital.img;
-                    imagesArray.forEach(element => {
-                        cloudinary.uploader.destroy(element.public_id)
-                    });
-                 }
-                else{
-                     console.log("images with this id not found")
-                }
+            if(req.files.img){
+                if(req.files.img.length>0){
+                    console.log(req.files.img)
+                const foundHospital= await hospitalModel.findOne({_id:hospital_id})
         
-                var pathsArray = [];
-                for (const file of req.files.img){
-                    const {path}= file
-                    const c_result = await cloudinary.uploader.upload(path)
-                     pathsArray.push({
-                       image_url: c_result.secure_url,
-                        public_id:c_result.public_id
-                     })
+                if(foundHospital){
+                    if(foundHospital.img.length>0){
+                        let imagesArray = foundHospital.img;
+                        imagesArray.forEach(element => {
+                            cloudinary.uploader.destroy(element.public_id)
+                        });
+                     }
+                    else{
+                         console.log("images with this id not found")
+                    }
             
+                    var pathsArray = [];
+                    for (const file of req.files.img){
+                        const {path}= file
+                        const c_result = await cloudinary.uploader.upload(path)
+                         pathsArray.push({
+                           image_url: c_result.secure_url,
+                            public_id:c_result.public_id
+                         })
+                
+                    }
+                    console.log(pathsArray)
                 }
-                console.log(pathsArray)
+                
+                }
             }
-            
-            }
+           
         }
         
     
