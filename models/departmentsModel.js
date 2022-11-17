@@ -14,7 +14,7 @@ const departmentSchema = new mongoose.Schema({
     name:String,
     opening_time:String,
     closing_time:String,
-    detail: String,
+    description: String,
     profile_img:{
         imgUrl:String,
         public_id:String

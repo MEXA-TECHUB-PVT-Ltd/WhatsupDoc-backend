@@ -12,6 +12,7 @@ exports.createDepartment= async(req,res)=>{
         const opening_time=req.body.opening_time;
         const closing_time= req.body.closing_time;
         const hospital_id = req.body.hospital_id;
+        const description = req.body.description;
 
         if(req.files.profile_img){
             const c_result= await cloudinary.uploader.upload(req.files.profile_img[0].path)
@@ -51,6 +52,7 @@ exports.createDepartment= async(req,res)=>{
                 profile_img:profile_img,
                 images:pathsArray,
                 hospital_id:hospital_id,
+                description:description
 
             })
 
@@ -203,6 +205,7 @@ exports.updateDepartment = async(req,res)=>{
         const opening_time=req.body.opening_time;
         const closing_time= req.body.closing_time;
         const hospital_id = req.body.hospital_id;
+        const description = req.body.description;
 
 
         var foundResult= await departmentModel.findOne({_id:department_id});
@@ -286,6 +289,7 @@ exports.updateDepartment = async(req,res)=>{
                 profile_img:profile_img,
                 images:pathsArray,
                 hospital_id:hospital_id,
+                description:description
             }
             ,{
                 new:true
