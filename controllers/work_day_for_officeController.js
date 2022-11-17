@@ -13,29 +13,43 @@ exports.createWorkDayForOffice = async (req,res)=>{
         const doc_id = req.body.doc_id;
         const day= req.body.day;
         const type_of_work = req.body.type_of_work;
-        
-        const newWorkDay = new work_day_for_officeModel({
-            _id:mongoose.Types.ObjectId(),
-            doc_id:doc_id,
-            day:day,
-            type_of_work:type_of_work,
-        })
 
-        const result = await newWorkDay.save();
-        if(result){
-            res.json({
-                message: "New work day has been created",
-                result: result,
-                statusCode:201
+
+
+        const foundResult = await work_day_for_officeModel.findOne({doc_id:doc_id , day: day});
+
+        if(!foundResult){
+            const newWorkDay = new work_day_for_officeModel({
+                _id:mongoose.Types.ObjectId(),
+                doc_id:doc_id,
+                day:day,
+                type_of_work:type_of_work,
             })
+    
+            const result = await newWorkDay.save();
+            if(result){
+                res.json({
+                    message: "New work day has been created",
+                    result: result,
+                    statusCode:201
+                })
+            }
+            else{
+                res.json({
+                    message: "work day could not be created",
+                    result: result,
+                    statusCode:404
+                })
+            }
         }
         else{
             res.json({
-                message: "work day could not be created",
-                result: result,
-                statusCode:404
+                message: "This doctor has already created the day of : "+ day,
+                status:"failed"
             })
         }
+        
+       
     }
     catch(err){
         res.json({
